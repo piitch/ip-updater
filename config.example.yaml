@@ -1,0 +1,51 @@
+# Wird normalerweise vom Wizard erzeugt: docker compose run --rm ip-updater setup
+# Secrets können als ${VARIABLE} aus .env gelesen werden.
+
+interval: 300          # Sekunden zwischen zwei Prüfungen
+resync_hours: 24       # trotzdem regelmäßig abgleichen (0 = nie)
+rule_description: HOME # nur Regeln mit dieser Beschreibung werden verwaltet
+
+hetzner:
+  enabled: true
+  api_token: ${HETZNER_API_TOKEN}
+  firewall_ids: [1234567]
+  protocols: [tcp]     # tcp, udp, icmp
+  port: any
+
+oci:
+  enabled: true
+  user: ocid1.user.oc1..xxxx
+  tenancy: ocid1.tenancy.oc1..xxxx
+  fingerprint: aa:bb:cc:...
+  region: eu-frankfurt-1
+  key_file: /config/oci/oci_api_key.pem
+  # alternativ statt der vier Felder oben: config_file: /config/oci/config
+  security_list_ids:
+    - ocid1.securitylist.oc1.eu-frankfurt-1.xxxx
+  protocol: all
+
+cloudflare:
+  enabled: true
+  api_token: ${CLOUDFLARE_API_TOKEN}   # Zone:DNS:Edit + Zone:Zone:Read
+  records:                             # Zone-IDs werden automatisch gefunden
+    - name: example.com
+      ttl: 120
+      proxied: false
+    - name: example.org
+      ttl: 120
+      proxied: false
+
+notify:
+  on: [change, error]
+  smtp:
+    enabled: true
+    host: mail.example.com
+    port: 465
+    security: ssl      # ssl | starttls | none
+    user: app@example.com
+    password: ${SMTP_PASS}
+    from: ip-update@example.com
+    to: notifications@example.com
+  ntfy:
+    enabled: false
+    url: https://ntfy.sh/mein-geheimes-topic

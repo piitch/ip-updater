@@ -1,0 +1,15 @@
+services:
+  ip-updater:
+    build: .
+    image: ip-updater:latest
+    container_name: ip-updater
+    hostname: ip-updater     # erscheint im Fuß der Mails
+    restart: unless-stopped
+    volumes:
+      - ./config:/config     # config.yaml (+ optional oci/ Ordner)
+      - ./data:/data         # letzter Stand (state.json)
+      - /etc/localtime:/etc/localtime:ro   # Uhrzeit in Logs/Mails wie im LXC
+    # Secrets alternativ per .env statt in config.yaml, z.B. ${CLOUDFLARE_API_TOKEN}
+    env_file:
+      - path: .env
+        required: false
